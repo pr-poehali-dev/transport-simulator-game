@@ -343,10 +343,9 @@ export function routeOpenCost(dist: number, type: "bus" | "train" | "plane"): nu
   return Math.round(dist * base[type]);
 }
 
-// Время рейса в мс (3–7 секунд, масштабируется дистанцией и скоростью)
-export function tripDurationMs(dist: number, vehicleSpeed: number): number {
-  const base = 3000 + dist * 60; // 3с + до ~4с за дистанцию
-  return Math.round(base / vehicleSpeed);
+// Время рейса — всегда 5 секунд
+export function tripDurationMs(_dist: number, _vehicleSpeed: number): number {
+  return 5000;
 }
 
 // Заработок с рейса
