@@ -42,28 +42,54 @@ export default function GameScreen({ companyName, countryCode }: Props) {
   const busCities = CITIES_BY_COUNTRY[countryCode] ?? [];
 
   // ── State ──
-  const [money, setMoney] = useState(0);
-  const [totalEver, setTotalEver] = useState(0);
-  const [phase, setPhase] = useState<Phase>("bus");
-  const [routes, setRoutes] = useState<Route[]>([]);
-  const [ownedVehicles, setOwnedVehicles] = useState<Record<string, string>>({
-    // routeId → vehicleId
-  });
-  const [currentVehicle, setCurrentVehicle] = useState<VehicleModel>(BUS_MODELS[0]);
+  const SAVE_KEY = `tt_save_${countryCode}`;
+
+  const loadSave = () => {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch { return null; }
+  };
+
+  const saved = loadSave();
+
+  const [money, setMoney] = useState<number>(saved?.money ?? 500);
+  const [totalEver, setTotalEver] = useState<number>(saved?.totalEver ?? 0);
+  const [phase, setPhase] = useState<Phase>(saved?.phase ?? "bus");
+  const [routes, setRoutes] = useState<Route[]>(
+    (saved?.routes ?? []).map((r: Route) => ({ ...r, active: true, progress: 0, startedAt: Date.now() }))
+  );
+  const [currentVehicle, setCurrentVehicle] = useState<VehicleModel>(
+    [...BUS_MODELS, ...TRAIN_MODELS, ...PLANE_MODELS].find((v) => v.id === saved?.vehicleId) ?? BUS_MODELS[0]
+  );
   const [selectedCity, setSelectedCity] = useState<City | null>(null);
   const [routeFrom, setRouteFrom] = useState<City | null>(null);
   const [panel, setPanel] = useState<"map" | "shop" | "routes">("map");
   const [demands, setDemands] = useState<CityDemand[]>([]);
   const [notifications, setNotifications] = useState<{ id: number; text: string; x: number; y: number }[]>([]);
-  const [trainUnlocked, setTrainUnlocked] = useState(false);
-  const [planeUnlocked, setPlaneUnlocked] = useState(false);
+  const [trainUnlocked, setTrainUnlocked] = useState<boolean>(saved?.trainUnlocked ?? false);
+  const [planeUnlocked, setPlaneUnlocked] = useState<boolean>(saved?.planeUnlocked ?? false);
   const [animFrame, setAnimFrame] = useState(0);
   const notifId = useRef(0);
   const rafRef = useRef<number>(0);
   const lastTickRef = useRef<number>(Date.now());
 
   // Города текущей фазы
-  const cities = busCities; // автобусы — 10 городов страны (поезда/самолёты расширят)
+  const cities = busCities;
+
+  // ── Автосохранение ──
+  useEffect(() => {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify({
+        money, totalEver, phase,
+        routes: routes.map((r) => ({ ...r, active: false, progress: 0 })),
+        vehicleId: currentVehicle.id,
+        trainUnlocked, planeUnlocked,
+      }));
+    } catch (e) { /* ignore */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [money, totalEver, phase, routes.length, currentVehicle.id, trainUnlocked, planeUnlocked]);
 
   // ── Генерация спроса ──
   useEffect(() => {

@@ -119,20 +119,22 @@ export default function RegisterScreen({ onStart }: Props) {
               autoFocus
             />
 
-            <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1" style={{ scrollbarWidth: "thin" }}>
-              {filtered.map((c) => (
-                <button key={c.code}
-                  onClick={() => setCountry(c.code)}
-                  className={`flex items-center gap-2 p-2 rounded-xl border-2 text-left transition-all hover:scale-105 active:scale-95 ${
-                    country === c.code
-                      ? "border-blue-400 bg-blue-50"
-                      : "border-gray-100 bg-white hover:border-gray-200"
-                  }`}
-                >
-                  <span className="text-2xl">{c.flag}</span>
-                  <span className="text-xs font-bold text-gray-700 leading-tight">{c.name}</span>
-                </button>
-              ))}
+            <div className="overflow-y-scroll pr-1" style={{ maxHeight: "220px", scrollbarWidth: "thin" }}>
+              <div className="grid grid-cols-2 gap-2">
+                {filtered.map((c) => (
+                  <button key={c.code}
+                    onClick={() => setCountry(c.code)}
+                    className={`flex items-center gap-2 p-2 rounded-xl border-2 text-left transition-all hover:scale-105 active:scale-95 ${
+                      country === c.code
+                        ? "border-blue-400 bg-blue-50"
+                        : "border-gray-100 bg-white hover:border-gray-200"
+                    }`}
+                  >
+                    <span className="text-2xl">{c.flag}</span>
+                    <span className="text-xs font-bold text-gray-700 leading-tight">{c.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <button
