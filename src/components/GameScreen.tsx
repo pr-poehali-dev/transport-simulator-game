@@ -58,7 +58,7 @@ export default function GameScreen({ companyName, countryCode }: Props) {
   const [totalEver, setTotalEver] = useState<number>(saved?.totalEver ?? 0);
   const [phase, setPhase] = useState<Phase>(saved?.phase ?? "bus");
   const [routes, setRoutes] = useState<Route[]>(
-    (saved?.routes ?? []).map((r: Route) => ({ ...r, active: true, progress: 0, startedAt: Date.now(), duration: 5000 }))
+    (saved?.routes ?? []).map((r: Route) => ({ ...r, active: true, progress: 0, startedAt: performance.now(), duration: 5000 }))
   );
   const [currentVehicle, setCurrentVehicle] = useState<VehicleModel>(
     [...BUS_MODELS, ...TRAIN_MODELS, ...PLANE_MODELS].find((v) => v.id === saved?.vehicleId) ?? BUS_MODELS[0]
@@ -210,7 +210,7 @@ export default function GameScreen({ companyName, countryCode }: Props) {
       progress: 0,
       lastEarned: 0,
       totalEarned: 0,
-      startedAt: Date.now(),
+      startedAt: performance.now(),
       duration,
     };
     setMoney((m) => m - Math.round(cost));
