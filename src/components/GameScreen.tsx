@@ -573,44 +573,40 @@ export default function GameScreen({ companyName, countryCode }: Props) {
                 );
                 if (!from || !to) return null;
                 return (
-                  <div key={route.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-                    <div className="flex items-center justify-between mb-2">
+                  <div key={route.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-3">
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-xl">{vehicle?.emoji}</span>
+                        {/* Иконка едет/мигает */}
+                        <span className="text-2xl" style={{
+                          display: "inline-block",
+                          animation: "vehicleBob 0.8s ease-in-out infinite alternate",
+                        }}>{vehicle?.emoji}</span>
                         <div>
                           <div className="font-bold text-sm text-gray-800">
                             {from.name} → {to.name}
                           </div>
-                          <div className="text-xs text-gray-500">{vehicle?.name}</div>
+                          <div className="text-xs text-gray-400">{vehicle?.name}</div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-black text-green-600 text-sm">
-                          +{route.totalEarned.toLocaleString()}₽
+                        {route.lastEarned > 0 && (
+                          <div className="font-black text-green-500 text-base">+{route.lastEarned}₽</div>
+                        )}
+                        <div className="text-xs text-gray-400">
+                          всего: {route.totalEarned.toLocaleString()}₽
                         </div>
-                        <div className="text-xs text-gray-400">всего</div>
                       </div>
                     </div>
-                    {/* Прогресс-бар рейса */}
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-none"
-                        style={{
-                          width: `${route.progress * 100}%`,
-                          background: progressColor(route.progress),
-                        }}
-                      />
+                    {/* Простой бегущий индикатор */}
+                    <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full transition-none"
+                        style={{ width: `${route.progress * 100}%`, background: "#60a5fa" }} />
                     </div>
-                    <div className="flex justify-between text-xs text-gray-400 mt-1">
+                    <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
                       <span>{from.name}</span>
-                      <span className="font-bold">{Math.round(route.progress * 100)}%</span>
+                      <span>⏱ {Math.ceil((1 - route.progress) * route.duration / 1000)}с</span>
                       <span>{to.name}</span>
                     </div>
-                    {route.lastEarned > 0 && (
-                      <div className="text-xs text-green-600 font-bold mt-1">
-                        Последний рейс: +{route.lastEarned}₽
-                      </div>
-                    )}
                   </div>
                 );
               })}
@@ -624,6 +620,10 @@ export default function GameScreen({ companyName, countryCode }: Props) {
           0%   { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
           50%  { transform: translate(-50%, calc(-50% - 30px)) scale(1.2); opacity: 1; }
           100% { transform: translate(-50%, calc(-50% - 60px)) scale(0.8); opacity: 0; }
+        }
+        @keyframes vehicleBob {
+          from { transform: translateY(0px); }
+          to   { transform: translateY(-3px); }
         }
       `}</style>
     </div>
